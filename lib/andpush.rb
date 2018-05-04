@@ -7,21 +7,23 @@ module Andpush
   DOMAIN = 'https://fcm.googleapis.com'.freeze
 
   class << self
-    def build(server_key, domain: nil, name: nil, proxy: nil, pool_size: Net::HTTP::Persistent::DEFAULT_POOL_SIZE)
+    def build(server_key, project_id: nil, domain: nil, name: nil, proxy: nil, pool_size: Net::HTTP::Persistent::DEFAULT_POOL_SIZE)
       ::Andpush::Client
         .new(domain || DOMAIN, request_handler: ConnectionPool.new(name: name, proxy: proxy, pool_size: pool_size))
-        .register_interceptor(Authenticator.new(server_key))
+        .register_interceptor(Authenticator.new(server_key, project_id))
     end
     alias new build
   end
 
   class Authenticator
-    def initialize(server_key)
+    def initialize(server_key, project_id)
       @server_key = server_key
+      @project_id = project_id
     end
 
     def before_request(uri, body, headers, options)
       headers['Authorization'] = "key=#{@server_key}"
+      headers['project_id'] = @project_id if @project_id
 
       [uri, body, headers, options]
     end

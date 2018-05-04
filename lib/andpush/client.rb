@@ -37,6 +37,10 @@ module Andpush
       request(Net::HTTP::Post, uri('/fcm/send', query), body, headers, method: :push, **options)
     end
 
+    def notification(body, query: {}, headers: {}, **options)
+      request(Net::HTTP::Post, uri('/fcm/notification', query), body, headers, method: :push, **options)
+    end
+
     private
 
     DEFAULT_OPTIONS = {
